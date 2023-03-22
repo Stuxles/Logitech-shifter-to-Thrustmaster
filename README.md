@@ -1,5 +1,7 @@
 # Logitech shifter to Thrustmaster wheelbase
 
+You will need a 3.3v pro micro
+
 | Pro micro | PS/2 plug | DB9 |
 |--|--|--|
 | VCC |  | 3&7 |
