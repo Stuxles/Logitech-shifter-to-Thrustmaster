@@ -25,7 +25,7 @@ enum position {
   up = 0x06
 };
 
-//H mode shifting codes
+//H mode shifting codes, true = normal | false = sequential
 void setHMode(bool isHMode) {
   if (isHMode) {
     command[0] |= 0x80;

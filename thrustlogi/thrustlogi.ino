@@ -3,8 +3,8 @@
 
 // Shifter analog axis thresholds
 // Change these values if the gears aren't detected correctly
-#define XAXIS_LEFT_THRESH 350
-#define XAXIS_RIGHT_THRESH 680
+#define XAXIS_LEFT_THRESH 365
+#define XAXIS_RIGHT_THRESH 580
 #define YAXIS_UP_THRESH 700
 #define YAXIS_DOWN_THRESH 300
 
@@ -34,7 +34,7 @@ void setup()
 
     Wire.begin(0x03); // join i2c bus (address optional for master)
 
-    //On startup sends command neutral to initialise this. It isnt nessecary but
+    //On startup sends command neutral to initialise this. It isnt necessary but
     //saves from moving to shift and back. Just be mindful of sequential switch i guess    
     setHMode(true);
     switchHGear(0);
@@ -59,22 +59,22 @@ void shift()
     {
         if (x <= XAXIS_LEFT_THRESH)
             newGear = GEAR_1;
-        if (x > XAXIS_LEFT_THRESH && x < XAXIS_RIGHT_THRESH)
+        else if (x > XAXIS_LEFT_THRESH && x < XAXIS_RIGHT_THRESH)
             newGear = GEAR_3;
-        if (x >= XAXIS_RIGHT_THRESH)
+        else if (x >= XAXIS_RIGHT_THRESH)
             newGear = GEAR_5;
     }
     else if (y <= YAXIS_DOWN_THRESH)
     {
         if (x <= XAXIS_LEFT_THRESH)
             newGear = GEAR_2;
-        if (x > XAXIS_LEFT_THRESH && x < XAXIS_RIGHT_THRESH)
+        else if (x > XAXIS_LEFT_THRESH && x < XAXIS_RIGHT_THRESH)
             newGear = GEAR_4;
-        if (x >= XAXIS_RIGHT_THRESH)
+        else if (x >= XAXIS_RIGHT_THRESH)
         {
             if (!reverse)
                 newGear = GEAR_6;
-            if (reverse)
+            else (reverse)
                 newGear = GEAR_REVERSE;
         }
     }
