@@ -1,6 +1,6 @@
 # Logitech shifter to Thrustmaster wheelbase
 
-Arduino project to interface a Logitech shifter with a Thrustmaster wheelbase using modern C++ practices.
+Arduino project to interface a Logitech shifter with a Thrustmaster wheelbase.
 
 ## Hardware Requirements
 
