@@ -41,7 +41,7 @@ void setup() {
     Wire.begin(i2c_SLAVE_ADDRESS); // join i2c bus (address optional for master)
 
     // On startup sends command neutral to initialize this. It isn't necessary but
-    // saves from moving to shift and back. Just be mindful of sequential switch I guess    
+    // saves from moving to shift and back. Just be mindful of sequential switch    
     setHMode(true);
     switchHGear(GEAR_NEUTRAL);
     sendCommand();  
