@@ -24,7 +24,7 @@ constexpr int Y_PIN = A2;
 constexpr int BUTTON_PIN = 15;
 
 // I2C and communication constants
-constexpr uint8_t i2c_SLAVE_ADDRESS = 0x03;
+constexpr uint8_t I2C_SLAVE_ADDRESS = 0x03;
 constexpr int CONTROLLER_UPDATE_RATE = 50;
 constexpr long SERIAL_BAUD_RATE = 9600;
 int currentGear;
@@ -38,7 +38,7 @@ void setup() {
     pinMode(Y_PIN, INPUT_PULLUP); // Y axis
     pinMode(BUTTON_PIN, INPUT);   // Reverse button
 
-    Wire.begin(i2c_SLAVE_ADDRESS); // join i2c bus (address optional for master)
+    Wire.begin(I2C_SLAVE_ADDRESS); // join i2c bus (address optional for master)
 
     // On startup sends command neutral to initialize this. It isn't necessary but
     // saves from moving to shift and back. Just be mindful of sequential switch    
