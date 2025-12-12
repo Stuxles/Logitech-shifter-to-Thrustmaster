@@ -1,92 +1,51 @@
 #include <Wire.h>
-#include "shifter.h"
+#include "ThrustmasterBase.h"
+#include "LogitechG29Shifter.h"
 
-// Shifter analog axis thresholds
-// Change these values if the gears aren't detected correctly
-#define XAXIS_LEFT_THRESH 365
-#define XAXIS_RIGHT_THRESH 580
-#define YAXIS_UP_THRESH 700
-#define YAXIS_DOWN_THRESH 300
+// Pin definitions
+constexpr uint8_t PIN_X_AXIS = A0;
+constexpr uint8_t PIN_Y_AXIS = A2;
+constexpr uint8_t PIN_REVERSE_BUTTON = 15;
 
-#define GEAR_1 1
-#define GEAR_2 2
-#define GEAR_3 3
-#define GEAR_4 4
-#define GEAR_5 5
-#define GEAR_6 6
-#define GEAR_REVERSE 8
-#define GEAR_NEUTRAL 0
+const int CONTROLLER_UPDATE_RATE_MS = 50;
 
-//Pin values
-#define xPin A0
-#define yPin A2
-#define buttonPin 15
+ThrustmasterBase wheelBase;
+LogitechG29Shifter shifter(PIN_X_AXIS, PIN_Y_AXIS, PIN_REVERSE_BUTTON);
 
-const int ControllerUpdateRate = 50;
-int currentGear;
+int currentGear = -1; // Initialize to invalid gear to force first update
 
-void setup()
-{
-    // Shifter analog input pins (make sure they are correctly plugged in Arduino)
-    pinMode(xPin, INPUT_PULLUP); // X axis
-    pinMode(yPin, INPUT_PULLUP); // Y axis
-    pinMode(buttonPin, INPUT);   // Reverse button
+void setup() {
+  Serial.begin(9600); // Initialize Serial for debugging
 
-    Wire.begin(0x03); // join i2c bus (address optional for master)
+  // Initialize Shifter
+  shifter.begin();
 
-    //On startup sends command neutral to initialise this. It isnt necessary but
-    //saves from moving to shift and back. Just be mindful of sequential switch i guess    
-    setHMode(true);
-    switchHGear(0);
-    sendCommand();  
+  // Initialize I2C
+  // Join i2c bus (address optional for master).
+  // Original code used 0x03 as slave address but acted as master.
+  Wire.begin(0x03);
+
+  // Initialize Wheelbase state
+  // On startup sends command neutral to initialise this.
+  wheelBase.setHMode(true);
+  wheelBase.switchHGear(0);
+  wheelBase.sendCommand();
 }
 
-void loop()
-{
-    shift();
-    delay(ControllerUpdateRate);
-}
+void loop() {
+  LogitechG29Shifter::Gear newGearEnum = shifter.getGear();
+  int newGear = static_cast<int>(newGearEnum);
 
-void shift()
-{
-    int x = analogRead(xPin);
-    int y = analogRead(yPin);
-    int reverse = digitalRead(buttonPin);
+  if (currentGear != newGear) {
+    currentGear = newGear;
 
-    int newGear = GEAR_NEUTRAL;
+    wheelBase.setHMode(true);
+    wheelBase.switchHGear(static_cast<uint8_t>(currentGear));
+    wheelBase.sendCommand();
 
-    if (y >= YAXIS_UP_THRESH)
-    {
-        if (x <= XAXIS_LEFT_THRESH)
-            newGear = GEAR_1;
-        else if (x > XAXIS_LEFT_THRESH && x < XAXIS_RIGHT_THRESH)
-            newGear = GEAR_3;
-        else if (x >= XAXIS_RIGHT_THRESH)
-            newGear = GEAR_5;
-    }
-    else if (y <= YAXIS_DOWN_THRESH)
-    {
-        if (x <= XAXIS_LEFT_THRESH)
-            newGear = GEAR_2;
-        else if (x > XAXIS_LEFT_THRESH && x < XAXIS_RIGHT_THRESH)
-            newGear = GEAR_4;
-        else if (x >= XAXIS_RIGHT_THRESH)
-        {
-            if (!reverse)
-                newGear = GEAR_6;
-            else (reverse)
-                newGear = GEAR_REVERSE;
-        }
-    }
+    Serial.print("Gear changed to: ");
+    Serial.println(currentGear);
+  }
 
-    if (currentGear != newGear)
-    {
-        currentGear = newGear;
-        
-        setHMode(true);
-        switchHGear(currentGear);
-        sendCommand();
-        
-        Serial.println(currentGear);
-    }
+  delay(CONTROLLER_UPDATE_RATE_MS);
 }
